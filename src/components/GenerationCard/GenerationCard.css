@@ -1,0 +1,114 @@
+.generation-card {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 4px solid;
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+  box-sizing: border-box;
+}
+
+.generation-card:hover {
+  transform: translateY(-5px);
+}
+
+.generation-header {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.generation-title {
+  font-family: "Pokemon", Arial, sans-serif;
+  font-size: 4rem;
+  font-weight: bold;
+  margin: 0;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+  letter-spacing: 4px;
+}
+
+.generation-image-placeholder {
+  width: 400px;
+  height: 300px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.placeholder-text {
+  color: #ffffff20;
+  font-size: 4rem;
+  font-weight: bold;
+  letter-spacing: 8px;
+}
+
+.generation-info {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.generation-subtitle {
+  font-size: 2.5rem;
+  color: #fff;
+  margin: 10px 0;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.generation-description {
+  font-size: 1.2rem;
+  color: #ccc;
+  margin: 10px 0;
+}
+
+.enter-arena-button {
+  padding: 15px 50px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 50px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 20px 0;
+}
+
+.enter-arena-button:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}
+
+.pokemon-icons {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.pokemon-icon-placeholder {
+  width: 60px;
+  height: 60px;
+  background-color: #333;
+  border-radius: 50%;
+  border: 3px solid #555;
+  transition: all 0.3s ease;
+}
+
+.pokemon-icon-placeholder:hover {
+  transform: scale(1.1);
+  border-color: #fff;
+}

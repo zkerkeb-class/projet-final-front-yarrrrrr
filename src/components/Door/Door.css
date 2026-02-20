@@ -1,0 +1,101 @@
+.door {
+  position: relative;
+  background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
+  border: 3px solid;
+  border-radius: 15px;
+  padding: 20px;
+  min-width: 200px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.door:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+}
+
+.door:hover .door-hover-effect {
+  opacity: 1;
+}
+
+.door.completed {
+  opacity: 0.8;
+}
+
+.door-hover-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.door-number {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 3rem;
+  font-weight: bold;
+  opacity: 0.3;
+}
+
+.door-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.door-image-placeholder {
+  width: 150px;
+  height: 150px;
+  background-color: #000;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.check-mark {
+  font-size: 4rem;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.door-opponent {
+  color: #fff;
+  margin: 0;
+  font-size: 1.3rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.door-difficulty {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.difficulty-easy {
+  background-color: #4caf50;
+  color: white;
+}
+
+.difficulty-medium {
+  background-color: #ff9800;
+  color: white;
+}
+
+.difficulty-hard {
+  background-color: #f44336;
+  color: white;
+}

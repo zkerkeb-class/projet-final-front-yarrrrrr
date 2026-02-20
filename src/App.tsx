@@ -1,35 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { Carousel, GenerationCard, BattleArena } from "./components";
+import { Titre } from "./components/Titre/Titre";
+import { GENERATIONS } from "./constants/generations";
+import type { GenerationData } from "./types";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedGeneration, setSelectedGeneration] =
+    useState<GenerationData | null>(null);
+
+  const handleEnterArena = (generation: GenerationData) => {
+    setSelectedGeneration(generation);
+  };
+
+  const handleBackToCarousel = () => {
+    setSelectedGeneration(null);
+  };
+
+  if (selectedGeneration) {
+    return (
+      <BattleArena
+        generation={selectedGeneration}
+        onBackToCarousel={handleBackToCarousel}
+      />
+    );
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="app">
+      <header className="app-header">
+        <Titre text="Pokemon Rogue League" />
+        {/* <p className="app-subtitle">
+          Choose your generation and prove your worth!
+        </p> */}
+      </header>
+
+      <Carousel currentIndex={currentIndex} onIndexChange={setCurrentIndex}>
+        {GENERATIONS.map((gen: GenerationData) => (
+          <GenerationCard
+            key={gen.generation}
+            generation={gen}
+            onEnterArena={() => handleEnterArena(gen)}
+          />
+        ))}
+      </Carousel>
+    </div>
+  );
 }
 
-export default App
+export default App;
