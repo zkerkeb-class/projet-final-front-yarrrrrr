@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Carousel, GenerationCard, BattleArena, TeamBuilder } from "./components";
 import { Titre } from "./components/Titre/Titre";
 import { GENERATIONS } from "./constants/generations";
-import type { GenerationData } from "./types";
+import type { GenerationData, Pokemon } from "./types";
 import "./App.css";
 
 function App() {
@@ -10,6 +10,33 @@ function App() {
   const [selectedGeneration, setSelectedGeneration] =
     useState<GenerationData | null>(null);
   const [buildingTeam, setBuildingTeam] = useState(false);
+  const [teams, setTeams] = useState<Record<number, Pokemon[]>>({});
+
+  // charger dès le démarrage les équipes existantes pour chaque génération
+  useEffect(() => {
+    const userId = 1; // remplacer par l'id du joueur connecté
+    const loadAll = async () => {
+      const map: Record<number, Pokemon[]> = {};
+      for (const gen of GENERATIONS) {
+        try {
+          const res = await fetch(
+            `http://localhost:3001/api/teams/${userId}/${gen.generation}`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            map[gen.generation] = data.pokemonTeam || [];
+          } else {
+            map[gen.generation] = [];
+          }
+        } catch (err) {
+          console.error("Erreur chargement équipe gen", gen.generation, err);
+          map[gen.generation] = [];
+        }
+      }
+      setTeams(map);
+    };
+    loadAll();
+  }, []);
 
   const handleEnterArena = (generation: GenerationData) => {
     setSelectedGeneration(generation);
@@ -20,6 +47,24 @@ function App() {
   };
 
   const handleBackToArena = () => {
+    // refetch équipe pour la génération actuelle au cas où elle a été modifiée
+    if (selectedGeneration) {
+      const userId = 1;
+      fetch(`http://localhost:3001/api/teams/${userId}/${selectedGeneration.generation}`)
+        .then((res) => {
+          if (res.ok) return res.json();
+          throw new Error("No team");
+        })
+        .then((data) => {
+          setTeams((prev) => ({
+            ...prev,
+            [selectedGeneration.generation]: data.pokemonTeam || [],
+          }));
+        })
+        .catch(() => {
+          setTeams((prev) => ({ ...prev, [selectedGeneration.generation]: [] }));
+        });
+    }
     setBuildingTeam(false);
   };
 
@@ -33,6 +78,7 @@ function App() {
       <TeamBuilder
         generation={selectedGeneration}
         onBackToArena={handleBackToArena}
+        preFilledTeam={teams[selectedGeneration.generation] || []}
       />
     );
   }
@@ -61,6 +107,7 @@ function App() {
           <GenerationCard
             key={gen.generation}
             generation={gen}
+            team={teams[gen.generation] || []}
             onEnterArena={() => handleEnterArena(gen)}
           />
         ))}

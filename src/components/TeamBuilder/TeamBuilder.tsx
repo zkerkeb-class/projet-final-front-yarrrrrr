@@ -5,10 +5,26 @@ import "./TeamBuilder.css";
 interface TeamBuilderProps {
   generation: GenerationData;
   onBackToArena: () => void;
+  preFilledTeam?: (Pokemon | null)[];
 }
 
-export const TeamBuilder = ({ generation, onBackToArena }: TeamBuilderProps) => {
-  const [team, setTeam] = useState<(Pokemon | null)[]>([null, null, null, null, null, null]);
+export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam }: TeamBuilderProps) => {
+  // Ensure we always have 6 slots. If preFilledTeam is an empty array or missing,
+  // initialize with six null slots. If preFilledTeam has <6 entries, pad with nulls.
+  const makeInitialTeam = (input?: (Pokemon | null)[]) => {
+    if (!input || input.length === 0) return Array(6).fill(null);
+    const padded = [...input];
+    while (padded.length < 6) padded.push(null);
+    return padded.slice(0, 6);
+  };
+
+  const [team, setTeam] = useState<(Pokemon | null)[]>(makeInitialTeam(preFilledTeam));
+
+  // If preFilledTeam changes after mount (e.g. loaded async), sync the state.
+  useEffect(() => {
+    setTeam(makeInitialTeam(preFilledTeam));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preFilledTeam]);
   const [availablePokemon, setAvailablePokemon] = useState<Pokemon[]>([]);
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
   const [loading, setLoading] = useState(true);
@@ -128,17 +144,36 @@ export const TeamBuilder = ({ generation, onBackToArena }: TeamBuilderProps) => 
     }
 
     try {
-      // Sauvegarder l'équipe via l'API backend
-      const response = await fetch("http://localhost:3001/api/teams", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          generationId: generation.generation,
-          pokemonTeam: filledTeam,
-        }),
-      });
+      const userId = 1; // TODO: utiliser l'id du joueur authentifié
+
+      // vérifier si une équipe existe déjà pour cette génération
+      const checkRes = await fetch(
+        `http://localhost:3001/api/teams/${userId}/${generation.generation}`
+      );
+      let response;
+      if (checkRes.ok) {
+        const existing = await checkRes.json();
+        response = await fetch(`http://localhost:3001/api/teams/${existing._id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ pokemonTeam: filledTeam }),
+        });
+      } else {
+        // création
+        response = await fetch("http://localhost:3001/api/teams", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            generationId: generation.generation,
+            pokemonTeam: filledTeam,
+          }),
+        });
+      }
 
       if (response.ok) {
         alert("Équipe sauvegardée avec succès!");
