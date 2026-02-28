@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Carousel, GenerationCard, BattleArena } from "./components";
+import { Carousel, GenerationCard, BattleArena, TeamBuilder } from "./components";
 import { Titre } from "./components/Titre/Titre";
 import { GENERATIONS } from "./constants/generations";
 import type { GenerationData } from "./types";
@@ -9,20 +9,40 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedGeneration, setSelectedGeneration] =
     useState<GenerationData | null>(null);
+  const [buildingTeam, setBuildingTeam] = useState(false);
 
   const handleEnterArena = (generation: GenerationData) => {
     setSelectedGeneration(generation);
   };
 
+  const handleBuildTeam = () => {
+    setBuildingTeam(true);
+  };
+
+  const handleBackToArena = () => {
+    setBuildingTeam(false);
+  };
+
   const handleBackToCarousel = () => {
     setSelectedGeneration(null);
+    setBuildingTeam(false);
   };
+
+  if (buildingTeam && selectedGeneration) {
+    return (
+      <TeamBuilder
+        generation={selectedGeneration}
+        onBackToArena={handleBackToArena}
+      />
+    );
+  }
 
   if (selectedGeneration) {
     return (
       <BattleArena
         generation={selectedGeneration}
         onBackToCarousel={handleBackToCarousel}
+        onBuildTeam={handleBuildTeam}
       />
     );
   }
