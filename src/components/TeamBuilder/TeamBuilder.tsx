@@ -29,64 +29,56 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam }: TeamBu
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [rollsLeft, setRollsLeft] = useState<number>(2);
 
-  // Récupérer les pokémons de la génération via PokeAPI
+  // Récupérer les pokémons proposés pour cet utilisateur/génération via backend pools
   useEffect(() => {
-    const fetchPokemon = async () => {
+    const loadPool = async () => {
       try {
         setLoading(true);
-        
-        // Obtenir les pokémons de la génération
-        const genResponse = await fetch(
-          `https://pokeapi.co/api/v2/generation/${generation.generation}/`
-        );
-        const genData = await genResponse.json();
-        const pokemonList = genData.pokemon_species;
-
-        // Sélectionner 20 pokémons aléatoires
-        const shuffled = [...pokemonList].sort(() => Math.random() - 0.5);
-        const randomPokemon = shuffled.slice(0, 20);
-
-        // Récupérer les détails de chaque pokémon
-        const pokemonDetails = await Promise.all(
-          randomPokemon.map(async (p: { name: string }) => {
-            const response = await fetch(
-              `https://pokeapi.co/api/v2/pokemon/${p.name}/`
-            );
-            const data = await response.json();
-            return {
-              id: data.id,
-              name: data.name.charAt(0).toUpperCase() + data.name.slice(1),
-              image: data.sprites.other["official-artwork"].front_default,
-              types: data.types.map((t: { type: { name: string } }) => 
-                t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1)
-              ),
-              stats: {
-                hp: data.stats[0].base_stat,
-                attack: data.stats[1].base_stat,
-                defense: data.stats[2].base_stat,
-                spAtk: data.stats[3].base_stat,
-                spDef: data.stats[4].base_stat,
-                speed: data.stats[5].base_stat,
-              },
-              height: data.height / 10, // Conversion en mètres
-              weight: data.weight / 10, // Conversion en kg
-            };
-          })
-        );
-
-        setAvailablePokemon(pokemonDetails);
+        const userId = 1; // TODO: remplacer avec l'utilisateur connecté
+        const res = await fetch(`http://localhost:3001/api/pools/${userId}/${generation.generation}`);
+        if (!res.ok) throw new Error("Erreur récupération pool");
+        const data = await res.json();
+        setAvailablePokemon(data.pokemonPool || []);
+        setRollsLeft(typeof data.rollsLeft === 'number' ? data.rollsLeft : 2);
         setError(null);
       } catch (err) {
-        console.error("Erreur lors de la récupération des pokémons:", err);
+        console.error("Erreur lors du chargement des pokémons:", err);
         setError("Erreur lors du chargement des pokémons. Veuillez réessayer.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPokemon();
+    loadPool();
   }, [generation.generation]);
+
+  // Consommer un roll et générer un nouveau pool
+  const handleRoll = async () => {
+    if (rollsLeft <= 0) {
+      alert("Plus de rolls disponibles");
+      return;
+    }
+    try {
+      setLoading(true);
+      const userId = 1; // TODO: remplacer par utilisateur connecté
+      const res = await fetch(`http://localhost:3001/api/pools/${userId}/${generation.generation}/roll`, { method: 'POST' });
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        alert(err?.message || "Erreur lors du roll");
+        return;
+      }
+      const data = await res.json();
+      setAvailablePokemon(data.pokemonPool || []);
+      setRollsLeft(typeof data.rollsLeft === 'number' ? data.rollsLeft : 0);
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors du roll");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Drag and drop handlers
   const handleDragStart = (
@@ -202,9 +194,21 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam }: TeamBu
           ← Retour
         </button>
         <h1 style={{ color: generation.color }}>Construisez votre équipe - {generation.name}</h1>
-        <button className="save-button" onClick={handleSaveTeam}>
-          💾 Sauvegarder l'équipe
-        </button>
+        <div className="header-actions">
+          <button
+            className="roll-button"
+            onClick={handleRoll}
+            disabled={loading || rollsLeft <= 0}
+            title={rollsLeft > 0 ? "Générer un nouveau pool (consomme un roll)" : "Aucun roll restant"}
+          >
+            🎲 Roll
+          </button>
+          <span className="rolls-left">Rolls: {rollsLeft}</span>
+
+          <button className="save-button" onClick={handleSaveTeam}>
+            💾 Sauvegarder l'équipe
+          </button>
+        </div>
       </div>
 
       <div className="team-builder-container">
