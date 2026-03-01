@@ -89,9 +89,9 @@ export const BattleArena = ({
       </div>
 
       <div className="arena-footer">
-        <p className="arena-description">
+        {/* <p className="arena-description">
           Complete all 5 battles to unlock the next generation!
-        </p>
+        </p> */}
       </div>
     </div>
   );
