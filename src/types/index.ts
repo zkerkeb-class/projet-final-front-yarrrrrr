@@ -18,3 +18,35 @@ export interface GenerationData {
   color: string;
   description: string;
 }
+
+export interface PokemonStats {
+  hp: number;
+  attack: number;
+  defense: number;
+  spAtk: number;
+  spDef: number;
+  speed: number;
+}
+
+export interface Pokemon {
+  id: number;
+  name: string;
+  image: string;
+  types: string[];
+  stats: PokemonStats;
+  height: number;
+  weight: number;
+}
+
+export interface TeamPokemon extends Pokemon {
+  teamSlot?: number;
+}
+
+export interface Team {
+  id?: string;
+  userId: number;
+  generationId: number;
+  pokemonTeam: Pokemon[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}

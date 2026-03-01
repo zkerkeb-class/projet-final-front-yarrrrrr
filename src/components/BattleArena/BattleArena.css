@@ -30,6 +30,27 @@
   transform: translateX(-5px);
 }
 
+.build-team-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 12px 25px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid currentColor;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.build-team-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
 .arena-title {
   font-size: 3.5rem;
   margin: 20px 0;

@@ -6,11 +6,13 @@ import "./BattleArena.css";
 interface BattleArenaProps {
   generation: GenerationData;
   onBackToCarousel: () => void;
+  onBuildTeam?: () => void;
 }
 
 export const BattleArena = ({
   generation,
   onBackToCarousel,
+  onBuildTeam,
 }: BattleArenaProps) => {
   // Initialiser 5 combats pour cette génération
   const [battles, setBattles] = useState<Battle[]>([
@@ -60,6 +62,10 @@ export const BattleArena = ({
         <h1 className="arena-title" style={{ color: generation.color }}>
           {generation.name} - Battle Arena
         </h1>
+
+        <button className="build-team-button" onClick={onBuildTeam} style={{ borderColor: generation.color, color: generation.color }}>
+          🎮 Build Your Team
+        </button>
 
         <div className="progress-container">
           <div className="progress-text">

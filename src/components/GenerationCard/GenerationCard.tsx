@@ -1,14 +1,16 @@
-import type { GenerationData } from "../../types";
+import type { GenerationData, Pokemon } from "../../types";
 import "./GenerationCard.css";
 
 interface GenerationCardProps {
   generation: GenerationData;
   onEnterArena: () => void;
+  team?: Pokemon[];
 }
 
 export const GenerationCard = ({
   generation,
   onEnterArena,
+  team = [],
 }: GenerationCardProps) => {
   return (
     <div className="generation-card" style={{ borderColor: generation.color }}>
@@ -44,9 +46,14 @@ export const GenerationCard = ({
 
       {/* Icônes Pokémon placeholder */}
       <div className="pokemon-icons">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="pokemon-icon-placeholder"></div>
-        ))}
+        {[...Array(6)].map((_, i) => {
+          const p = team && team[i];
+          return (
+            <div key={i} className="pokemon-icon-placeholder">
+              {p ? <img src={p.image} alt={p.name} /> : <span>?</span>}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
