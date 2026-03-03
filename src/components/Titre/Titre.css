@@ -4,12 +4,12 @@
   position: relative;
   width: fit-content;
   margin: 0;
-  padding: 20px 30px;
+  padding: clamp(10px, 2vw, 20px) clamp(15px, 3vw, 30px);
 }
 
 .title-blue {
   font-family: "Pokemon Solid", sans-serif;
-  font-size: 3em;
+  font-size: clamp(1.5em, 4vw, 3em);
   color: #002244;
   text-shadow:
     -4px -4px 0 #3b4cca,
@@ -29,13 +29,50 @@
 
 .title-yellow {
   font-family: "Pokemon Solid", sans-serif;
-  font-size: 3em;
+  font-size: clamp(1.5em, 4vw, 3em);
   color: #ffde00;
   position: absolute;
-  top: 20px;
-  left: 30px;
+  top: clamp(10px, 2vw, 20px);
+  left: clamp(15px, 3vw, 30px);
   margin: 0;
   padding: 0;
   z-index: 2;
   line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .title-blue,
+  .title-yellow {
+    font-size: 2em;
+    text-shadow:
+      -3px -3px 0 #3b4cca,
+      3px -3px 0 #3b4cca,
+      -3px 3px 0 #3b4cca,
+      3px 3px 0 #3b4cca,
+      -4px -4px 0 #3b4cca,
+      4px -4px 0 #3b4cca,
+      -4px 4px 0 #3b4cca,
+      4px 4px 0 #3b4cca;
+  }
+}
+
+@media (max-width: 480px) {
+  .title-container {
+    padding: 8px 12px;
+  }
+
+  .title-blue,
+  .title-yellow {
+    font-size: 1.5em;
+    text-shadow:
+      -2px -2px 0 #3b4cca,
+      2px -2px 0 #3b4cca,
+      -2px 2px 0 #3b4cca,
+      2px 2px 0 #3b4cca;
+  }
+
+  .title-yellow {
+    top: 8px;
+    left: 12px;
+  }
 }

@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { Carousel, GenerationCard, BattleArena, TeamBuilder } from "./components";
+import {
+  Carousel,
+  GenerationCard,
+  BattleArena,
+  TeamBuilder,
+} from "./components";
 import { Titre } from "./components/Titre/Titre";
 import Login, { type AuthUser } from "./components/login/login";
 import UserProfile from "./components/UserProfile/UserProfile";
@@ -117,7 +122,7 @@ function App() {
       for (const gen of GENERATIONS) {
         try {
           const res = await fetch(
-            `http://localhost:3001/api/teams/${userId}/${gen.generation}`
+            `http://localhost:3001/api/teams/${userId}/${gen.generation}`,
           );
           if (res.ok) {
             const data = await res.json();
@@ -147,7 +152,9 @@ function App() {
     // refetch équipe pour la génération actuelle au cas où elle a été modifiée
     if (selectedGeneration && authUser) {
       const userId = authUser.id;
-      fetch(`http://localhost:3001/api/teams/${userId}/${selectedGeneration.generation}`)
+      fetch(
+        `http://localhost:3001/api/teams/${userId}/${selectedGeneration.generation}`,
+      )
         .then((res) => {
           if (res.ok) return res.json();
           throw new Error("No team");
@@ -159,7 +166,10 @@ function App() {
           }));
         })
         .catch(() => {
-          setTeams((prev) => ({ ...prev, [selectedGeneration.generation]: [] }));
+          setTeams((prev) => ({
+            ...prev,
+            [selectedGeneration.generation]: [],
+          }));
         });
     }
     setBuildingTeam(false);
@@ -190,6 +200,10 @@ function App() {
         generation={selectedGeneration}
         onBackToCarousel={handleBackToCarousel}
         onBuildTeam={handleBuildTeam}
+        userLevel={authUser?.niveau}
+        userUsername={authUser?.username}
+        authToken={authToken || undefined}
+        onProfileUpdated={handleProfileUpdated}
       />
     );
   }
@@ -219,13 +233,18 @@ function App() {
         />
       )}
 
-      <Carousel currentIndex={currentIndex} onIndexChange={setCurrentIndex}>
+      <Carousel
+        currentIndex={currentIndex}
+        onIndexChange={setCurrentIndex}
+        userLevel={authUser?.niveau}
+      >
         {GENERATIONS.map((gen: GenerationData) => (
           <GenerationCard
             key={gen.generation}
             generation={gen}
             team={teams[gen.generation] || []}
             onEnterArena={() => handleEnterArena(gen)}
+            userLevel={authUser?.niveau}
           />
         ))}
       </Carousel>

@@ -5,13 +5,16 @@ interface GenerationCardProps {
   generation: GenerationData;
   onEnterArena: () => void;
   team?: Pokemon[];
+  userLevel?: number;
 }
 
 export const GenerationCard = ({
   generation,
   onEnterArena,
   team = [],
+  userLevel = 1,
 }: GenerationCardProps) => {
+  const isLocked = generation.generation > userLevel;
   return (
     <div className="generation-card" style={{ borderColor: generation.color }}>
       <div className="generation-header">
@@ -33,16 +36,26 @@ export const GenerationCard = ({
         <p className="generation-description">{generation.description}</p>
       </div>
 
-      <button
-        className="enter-arena-button"
-        style={{
-          backgroundColor: generation.color,
-          boxShadow: `0 4px 15px ${generation.color}40`,
-        }}
-        onClick={onEnterArena}
-      >
-        Enter Arena
-      </button>
+      <div className="button-container">
+        <button
+          className={`enter-arena-button ${isLocked ? "locked" : ""}`}
+          style={{
+            backgroundColor: isLocked ? "#666" : generation.color,
+            boxShadow: isLocked
+              ? "0 4px 15px rgba(0,0,0,0.3)"
+              : `0 4px 15px ${generation.color}40`,
+          }}
+          onClick={isLocked ? undefined : onEnterArena}
+          disabled={isLocked}
+        >
+          {isLocked ? "🔒 Verrouillé" : "Enter Arena"}
+        </button>
+        {isLocked && (
+          <div className="lock-tooltip">
+            Veuillez finir le niveau précédent pour débloquer cette porte
+          </div>
+        )}
+      </div>
 
       {/* Icônes Pokémon placeholder */}
       <div className="pokemon-icons">

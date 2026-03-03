@@ -1,25 +1,30 @@
 .battle-arena {
   min-height: 100vh;
-  padding: 40px 20px;
+  max-height: 100vh;
+  padding: clamp(20px, 3vw, 40px) clamp(10px, 2vw, 20px);
   background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .arena-header {
   max-width: 1400px;
-  margin: 0 auto 40px;
+  margin: 0 auto clamp(20px, 3vh, 40px);
   text-align: center;
+  flex-shrink: 0;
 }
 
 .back-button {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  padding: 12px 25px;
+  top: clamp(10px, 2vh, 20px);
+  left: clamp(10px, 2vw, 20px);
+  padding: clamp(8px, 1.5vh, 12px) clamp(15px, 2.5vw, 25px);
   background-color: rgba(255, 255, 255, 0.1);
   color: white;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 25px;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: bold;
@@ -32,13 +37,13 @@
 
 .build-team-button {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  padding: 12px 25px;
+  top: clamp(10px, 2vh, 20px);
+  right: clamp(10px, 2vw, 20px);
+  padding: clamp(8px, 1.5vh, 12px) clamp(15px, 2.5vw, 25px);
   background-color: rgba(255, 255, 255, 0.1);
   border: 2px solid currentColor;
   border-radius: 25px;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1.5vw, 1rem);
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: bold;
@@ -52,22 +57,23 @@
 }
 
 .arena-title {
-  font-size: 3.5rem;
-  margin: 20px 0;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin: clamp(10px, 2vh, 20px) 0;
   font-weight: bold;
-  letter-spacing: 3px;
+  letter-spacing: clamp(1px, 0.3vw, 3px);
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .progress-container {
   max-width: 600px;
-  margin: 30px auto;
+  margin: clamp(15px, 3vh, 30px) auto;
+  padding: 0 20px;
 }
 
 .progress-text {
   color: #fff;
-  font-size: 1.2rem;
-  margin-bottom: 10px;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  margin-bottom: clamp(5px, 1vh, 10px);
   font-weight: bold;
 }
 
@@ -91,24 +97,56 @@
   display: flex;
   justify-content: center;
   align-items: stretch;
-  gap: 30px;
+  gap: clamp(15px, 3vw, 30px);
   flex-wrap: wrap;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: clamp(20px, 4vh, 40px) clamp(10px, 2vw, 20px);
+  flex: 1;
 }
 
 .arena-footer {
   text-align: center;
-  margin-top: 40px;
-  padding: 20px;
+  margin-top: clamp(20px, 3vh, 40px);
+  padding: clamp(10px, 2vh, 20px);
+  flex-shrink: 0;
 }
 
-.arena-description {
-  color: #ccc;
-  font-size: 1.3rem;
-  max-width: 600px;
+.level-up-message {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: white;
+  padding: clamp(15px, 2vh, 20px) clamp(20px, 3vw, 30px);
+  border-radius: 12px;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: bold;
+  box-shadow: 0 8px 16px rgba(34, 197, 94, 0.4);
+  animation: slideIn 0.5s ease-out;
+  max-width: 90%;
   margin: 0 auto;
+}
+
+.all-complete-message {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  color: white;
+  padding: clamp(15px, 2vh, 20px) clamp(20px, 3vw, 30px);
+  border-radius: 12px;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: bold;
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+  animation: slideIn 0.5s ease-out;
+  max-width: 90%;
+  margin: 0 auto;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 1200px) {
@@ -118,12 +156,46 @@
 }
 
 @media (max-width: 768px) {
+  .battle-arena {
+    max-height: none;
+  }
+
+  .arena-header {
+    padding-top: 60px;
+  }
+
+  .back-button,
+  .build-team-button {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    display: block;
+    margin: 10px auto;
+    width: fit-content;
+  }
+
   .arena-title {
     font-size: 2rem;
+    margin-top: 20px;
   }
 
   .doors-container {
     flex-direction: column;
     align-items: center;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .arena-title {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+  }
+
+  .back-button,
+  .build-team-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
   }
 }

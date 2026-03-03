@@ -1,8 +1,18 @@
 export interface Battle {
   id: number;
   opponentName: string;
-  difficulty: "easy" | "medium" | "hard";
   completed: boolean;
+  avatar?: string;
+  type?: string;
+}
+
+export interface Dresseur {
+  Id: number;
+  Gen: number;
+  Nom: string;
+  Type: string;
+  Avatar: string;
+  Pokemon: Pokemon[];
 }
 
 export interface Generation {

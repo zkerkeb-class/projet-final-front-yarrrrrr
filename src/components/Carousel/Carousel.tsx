@@ -4,6 +4,7 @@ interface CarouselProps {
   children: React.ReactNode[];
   currentIndex: number;
   onIndexChange: (index: number) => void;
+  userLevel?: number;
 }
 
 export const Carousel = ({
@@ -12,19 +13,15 @@ export const Carousel = ({
   onIndexChange,
 }: CarouselProps) => {
   const goToPrevious = () => {
-    const isFirstSlide = currentIndex === 0;
-    const newIndex = isFirstSlide ? children.length - 1 : currentIndex - 1;
-    onIndexChange(newIndex);
+    if (currentIndex > 0) {
+      onIndexChange(currentIndex - 1);
+    }
   };
 
   const goToNext = () => {
-    const isLastSlide = currentIndex === children.length - 1;
-    const newIndex = isLastSlide ? 0 : currentIndex + 1;
-    onIndexChange(newIndex);
-  };
-
-  const goToSlide = (slideIndex: number) => {
-    onIndexChange(slideIndex);
+    if (currentIndex < children.length - 1) {
+      onIndexChange(currentIndex + 1);
+    }
   };
 
   return (
@@ -35,7 +32,7 @@ export const Carousel = ({
         disabled={currentIndex === 0}
         style={{
           opacity: currentIndex === 0 ? 0 : 1,
-          cursor: currentIndex === 0 ? "default" : "pointer",
+          pointerEvents: currentIndex === 0 ? "none" : "auto",
         }}
       >
         ‹
@@ -60,21 +57,11 @@ export const Carousel = ({
         disabled={currentIndex === children.length - 1}
         style={{
           opacity: currentIndex === children.length - 1 ? 0 : 1,
-          cursor: currentIndex === children.length - 1 ? "default" : "pointer",
+          pointerEvents: currentIndex === children.length - 1 ? "none" : "auto",
         }}
       >
         ›
       </button>
-
-      <div className="carousel-dots">
-        {children.map((_, slideIndex) => (
-          <div
-            key={slideIndex}
-            className={`carousel-dot ${slideIndex === currentIndex ? "active" : ""}`}
-            onClick={() => goToSlide(slideIndex)}
-          />
-        ))}
-      </div>
     </div>
   );
 };
