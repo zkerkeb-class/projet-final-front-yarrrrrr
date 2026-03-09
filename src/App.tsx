@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   Carousel,
   GenerationCard,
   BattleArena,
   TeamBuilder,
+  // BattleScreen not used in App itself
+  BattlePage,
 } from "./components";
 import { Titre } from "./components/Titre/Titre";
 import Login, { type AuthUser } from "./components/login/login";
@@ -11,6 +14,7 @@ import UserProfile from "./components/UserProfile/UserProfile";
 import EditProfil from "./components/EditProfil/EditProfil";
 import { GENERATIONS } from "./constants/generations";
 import type { GenerationData, Pokemon } from "./types";
+import { BattleProgressProvider } from "./contexts/BattleProgressContext";
 import "./App.css";
 
 const API_URL = "http://localhost:3001";
@@ -180,60 +184,63 @@ function App() {
     setBuildingTeam(false);
   };
 
-  if (!authToken || !authUser) {
-    return <Login onAuthSuccess={handleAuthSuccess} />;
-  }
+  // this inner component will handle rendering based on state
+  const MainContent = () => {
+    if (!authToken || !authUser) {
+      return <Login onAuthSuccess={handleAuthSuccess} />;
+    }
 
-  if (buildingTeam && selectedGeneration) {
-    return (
-      <TeamBuilder
-        generation={selectedGeneration}
-        onBackToArena={handleBackToArena}
-        preFilledTeam={teams[selectedGeneration.generation] || []}
-      />
-    );
-  }
-
-  if (selectedGeneration) {
-    return (
-      <BattleArena
-        generation={selectedGeneration}
-        onBackToCarousel={handleBackToCarousel}
-        onBuildTeam={handleBuildTeam}
-        userLevel={authUser?.niveau}
-        userUsername={authUser?.username}
-        authToken={authToken || undefined}
-        onProfileUpdated={handleProfileUpdated}
-      />
-    );
-  }
-
-  return (
-    <div className="app">
-      <header className="app-header">
-        <div className="app-header-top">
-          <Titre text="Pokemon Rogue League" />
-          <UserProfile
-            user={authUser}
-            onLogout={clearSession}
-            onEditClick={() => setIsEditingProfile(true)}
-          />
-        </div>
-        {/* <p className="app-subtitle">
-          Choose your generation and prove your worth!
-        </p> */}
-      </header>
-
-      {isEditingProfile && authToken && (
-        <EditProfil
-          user={authUser}
-          token={authToken}
-          onClose={() => setIsEditingProfile(false)}
-          onProfileUpdated={handleProfileUpdated}
+    if (buildingTeam && selectedGeneration) {
+      return (
+        <TeamBuilder
+          generation={selectedGeneration}
+          onBackToArena={handleBackToArena}
+          preFilledTeam={teams[selectedGeneration.generation] || []}
         />
-      )}
+      );
+    }
 
-      <Carousel
+    if (selectedGeneration) {
+      return (
+        <BattleArena
+          generation={selectedGeneration}
+          onBackToCarousel={handleBackToCarousel}
+          onBuildTeam={handleBuildTeam}
+          userLevel={authUser?.niveau}
+          userUsername={authUser?.username}
+          authToken={authToken || undefined}
+          onProfileUpdated={handleProfileUpdated}
+          userTeam={teams[selectedGeneration.generation] || []}
+        />
+      );
+    }
+
+    return (
+      <div className="app">
+        <header className="app-header">
+          <div className="app-header-top">
+            <Titre text="Pokemon Rogue League" />
+            <UserProfile
+              user={authUser}
+              onLogout={clearSession}
+              onEditClick={() => setIsEditingProfile(true)}
+            />
+          </div>
+          {/* <p className="app-subtitle">
+            Choose your generation and prove your worth!
+          </p> */}
+        </header>
+
+        {isEditingProfile && authToken && (
+          <EditProfil
+            user={authUser}
+            token={authToken}
+            onClose={() => setIsEditingProfile(false)}
+            onProfileUpdated={handleProfileUpdated}
+          />
+        )}
+
+        <Carousel
         currentIndex={currentIndex}
         onIndexChange={setCurrentIndex}
         userLevel={authUser?.niveau}
@@ -249,6 +256,24 @@ function App() {
         ))}
       </Carousel>
     </div>
+  );
+};
+
+  // top level return includes router and provider
+  return (
+    <BrowserRouter>
+      <BattleProgressProvider>
+        <Routes>
+          <Route
+            path="/battle/:gen/:dresseurId"
+            element={
+              <BattlePage authUser={authUser || undefined} />
+            }
+          />
+          <Route path="/*" element={<MainContent />} />
+        </Routes>
+      </BattleProgressProvider>
+    </BrowserRouter>
   );
 }
 

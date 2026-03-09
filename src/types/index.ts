@@ -1,9 +1,24 @@
 export interface Battle {
   id: number;
+  /** identifiant dans la collection dresseurs (Id) */
+  dresseurId?: number;
   opponentName: string;
   completed: boolean;
   avatar?: string;
   type?: string;
+}
+
+export interface DresseurPokemon {
+  Id: number;
+  Nom: string;
+  Niveau: number;
+  Type1: string;
+  Type2?: string | null;
+  Faiblesse: string[];
+  Resistance: string[];
+  Photo: string;
+  // for enriched responses
+  stats?: PokemonStats;
 }
 
 export interface Dresseur {
@@ -12,7 +27,7 @@ export interface Dresseur {
   Nom: string;
   Type: string;
   Avatar: string;
-  Pokemon: Pokemon[];
+  Pokemon: DresseurPokemon[];
 }
 
 export interface Generation {

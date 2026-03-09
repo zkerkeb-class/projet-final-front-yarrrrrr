@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import type { Battle, GenerationData, Dresseur } from "../../types";
+import { useNavigate } from "react-router-dom";
+import type { Battle, GenerationData, Dresseur, Pokemon } from "../../types";
 import type { AuthUser } from "../login/login";
 import { Door } from "../Door/Door";
+import { useBattleProgress } from "../../contexts/BattleProgressContext";
 import "./BattleArena.css";
 
 interface BattleArenaProps {
@@ -12,6 +14,8 @@ interface BattleArenaProps {
   userUsername?: string;
   authToken?: string;
   onProfileUpdated?: (updatedUser: AuthUser) => void;
+  /** l'équipe du joueur pour la génération courante */
+  userTeam: Pokemon[];
 }
 
 export const BattleArena = ({
@@ -22,10 +26,12 @@ export const BattleArena = ({
   userUsername,
   authToken,
   onProfileUpdated,
+  userTeam,
 }: BattleArenaProps) => {
   const [battles, setBattles] = useState<Battle[]>([]);
   const [levelUpProcessing, setLevelUpProcessing] = useState(false);
   const [loadingDresseurs, setLoadingDresseurs] = useState(true);
+
 
   // Précharger les images des types
   useEffect(() => {
@@ -61,8 +67,9 @@ export const BattleArena = ({
           // Créer les battles à partir des dresseurs
           const newBattles: Battle[] = dresseurs.map((dresseur, index) => ({
             id: index + 1,
+            dresseurId: dresseur.Id,
             opponentName: dresseur.Nom,
-            completed: false,
+            completed: !!completed[dresseur.Id],
             avatar: dresseur.Avatar,
             type: dresseur.Type.toLowerCase(),
           }));
@@ -81,18 +88,35 @@ export const BattleArena = ({
     loadDresseurs();
   }, [generation.generation]);
 
-  const handleBattleClick = (battleId: number) => {
-    // Pour l'instant, juste marquer le combat comme complété
-    setBattles((prev) =>
-      prev.map((battle) =>
-        battle.id === battleId
-          ? { ...battle, completed: !battle.completed }
-          : battle,
-      ),
-    );
+  const navigate = useNavigate();
+  const { completed } = useBattleProgress();
+
+  const handleBattleClick = (battle: Battle) => {
+    if (userTeam.length === 0) {
+      alert("Vous devez construire une équipe avant de combattre !");
+      return;
+    }
+    if (!battle.dresseurId) {
+      console.error("Battle missing dresseurId", battle);
+      return;
+    }
+    // navigate to battle page with generation info
+    navigate(`/battle/${generation.generation}/${battle.dresseurId}`);
   };
 
   const completedBattles = battles.filter((b) => b.completed).length;
+
+  // update local battle list whenever context completed flags change
+  useEffect(() => {
+    if (battles.length > 0) {
+      setBattles((prev) =>
+        prev.map((b) => ({
+          ...b,
+          completed: b.dresseurId ? Boolean(completed[b.dresseurId]) : b.completed,
+        })),
+      );
+    }
+  }, [completed]);
   const progress = (completedBattles / battles.length) * 100;
   const allBattlesCompleted = completedBattles === battles.length;
 
@@ -203,11 +227,12 @@ export const BattleArena = ({
               key={battle.id}
               battle={battle}
               generationColor={generation.color}
-              onBattleClick={() => handleBattleClick(battle.id)}
+              onBattleClick={() => handleBattleClick(battle)}
             />
           ))
         )}
       </div>
+
 
       <div className="arena-footer">
         {allBattlesCompleted && userLevel === generation.generation && (

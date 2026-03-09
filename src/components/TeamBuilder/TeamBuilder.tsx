@@ -136,7 +136,7 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam }: TeamBu
     }
 
     try {
-      const userId = 1; // TODO: utiliser l'id du joueur authentifié
+      const userId = 2; // TODO: utiliser l'id du joueur authentifié
 
       // vérifier si une équipe existe déjà pour cette génération
       const checkRes = await fetch(
