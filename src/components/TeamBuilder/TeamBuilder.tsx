@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import type { Pokemon, GenerationData } from "../../types";
+import type { AuthUser } from "../login/login";
 import "./TeamBuilder.css";
 
 interface TeamBuilderProps {
   generation: GenerationData;
   onBackToArena: () => void;
   preFilledTeam?: (Pokemon | null)[];
+  authUser: AuthUser | null;
 }
 
-export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam }: TeamBuilderProps) => {
+export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser }: TeamBuilderProps) => {
   // Ensure we always have 6 slots. If preFilledTeam is an empty array or missing,
   // initialize with six null slots. If preFilledTeam has <6 entries, pad with nulls.
   const makeInitialTeam = (input?: (Pokemon | null)[]) => {
@@ -36,7 +38,7 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam }: TeamBu
     const loadPool = async () => {
       try {
         setLoading(true);
-        const userId = 1; // TODO: remplacer avec l'utilisateur connecté
+        const userId = authUser?.id ?? 1; // Utilisateur connecté
         const res = await fetch(`http://localhost:3001/api/pools/${userId}/${generation.generation}`);
         if (!res.ok) throw new Error("Erreur récupération pool");
         const data = await res.json();
@@ -62,7 +64,7 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam }: TeamBu
     }
     try {
       setLoading(true);
-      const userId = 1; // TODO: remplacer par utilisateur connecté
+      const userId = authUser?.id ?? 1; // Utilisateur connecté
       const res = await fetch(`http://localhost:3001/api/pools/${userId}/${generation.generation}/roll`, { method: 'POST' });
       if (!res.ok) {
         const err = await res.json().catch(() => null);
@@ -136,15 +138,16 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam }: TeamBu
     }
 
     try {
-      const userId = 2; // TODO: utiliser l'id du joueur authentifié
+      const userId = authUser?.id ?? 2; // ID du joueur authentifié
 
       // vérifier si une équipe existe déjà pour cette génération
       const checkRes = await fetch(
         `http://localhost:3001/api/teams/${userId}/${generation.generation}`
       );
+      const existing = await checkRes.json();
       let response;
-      if (checkRes.ok) {
-        const existing = await checkRes.json();
+      if (existing._id) {
+        // mise à jour de l'équipe existante
         response = await fetch(`http://localhost:3001/api/teams/${existing._id}`, {
           method: "PUT",
           headers: {
@@ -153,7 +156,7 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam }: TeamBu
           body: JSON.stringify({ pokemonTeam: filledTeam }),
         });
       } else {
-        // création
+        // création d'une nouvelle équipe
         response = await fetch("http://localhost:3001/api/teams", {
           method: "POST",
           headers: {

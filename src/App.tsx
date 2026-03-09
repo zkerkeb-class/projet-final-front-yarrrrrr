@@ -196,6 +196,7 @@ function App() {
           generation={selectedGeneration}
           onBackToArena={handleBackToArena}
           preFilledTeam={teams[selectedGeneration.generation] || []}
+          authUser={authUser}
         />
       );
     }
