@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Pokemon, Dresseur } from "../../types";
+import { getTypeEffectiveness } from "../../constants/typeChart";
 import "./BattleScreen.css";
 
 interface BattleScreenProps {
@@ -36,10 +37,12 @@ export default function BattleScreen({ playerTeam, opponent, onEnd }: BattleScre
     attacker: Pokemon,
     defender: Pokemon,
     special: boolean,
+    attackType: string,
   ) => {
-    const atk = special ? attacker.stats.spAtk : attacker.stats.attack;
+    const baseDmg = special ? attacker.stats.spAtk : attacker.stats.attack;
     const def = special ? defender.stats.spDef : defender.stats.defense;
-    return Math.max(1, atk - def);
+    const typeMultiplier = getTypeEffectiveness(attackType, defender.types);
+    return Math.max(1, Math.floor((baseDmg - def) * typeMultiplier));
   };
 
   // advance to next fighter if current is fainted
@@ -76,6 +79,7 @@ export default function BattleScreen({ playerTeam, opponent, onEnd }: BattleScre
   const performAttack = async (
     attackerSide: "player" | "opponent",
     special: boolean,
+    attackType: string,
   ) => {
     const attackerF =
       attackerSide === "player"
@@ -89,6 +93,7 @@ export default function BattleScreen({ playerTeam, opponent, onEnd }: BattleScre
       attackerF.pokemon,
       defenderF.pokemon,
       special,
+      attackType,
     );
     defenderF.currentHp = Math.max(0, defenderF.currentHp - damage);
 
@@ -99,12 +104,12 @@ export default function BattleScreen({ playerTeam, opponent, onEnd }: BattleScre
     addLog(
       `${
         attackerSide === "player" ? "Vous" : "L'adversaire"
-      } utilise une attaque ${special ? "spéciale" : "normale"} et inflige ${damage} dégâts !`,
+      } utilise une attaque ${special ? "spéciale" : "normale"} de type ${attackType} et inflige ${damage} dégâts !`,
     );
   };
 
   // execute a full turn after player choice
-  const handlePlayerChoice = async (special: boolean) => {
+  const handlePlayerChoice = async (attackType: string, special: boolean) => {
     setWaitingForPlayer(false);
 
     // determine order by speed
@@ -113,21 +118,23 @@ export default function BattleScreen({ playerTeam, opponent, onEnd }: BattleScre
     const playerFirst = playerSpd >= oppSpd;
 
     if (playerFirst) {
-      await performAttack("player", special);
+      await performAttack("player", special, attackType);
       if (checkFaint()) return;
 
-      // opponent action
+      // opponent action - opponent always uses its first type and alternates special
+      const oppType = oppFighters[oppIdx].pokemon.types[0];
       const oppSpecial = opponentNextSpecial;
-      await performAttack("opponent", oppSpecial);
+      await performAttack("opponent", oppSpecial, oppType);
       setOpponentNextSpecial(!oppSpecial);
       if (checkFaint()) return;
     } else {
+      const oppType = oppFighters[oppIdx].pokemon.types[0];
       const oppSpecial = opponentNextSpecial;
-      await performAttack("opponent", oppSpecial);
+      await performAttack("opponent", oppSpecial, oppType);
       setOpponentNextSpecial(!oppSpecial);
       if (checkFaint()) return;
 
-      await performAttack("player", special);
+      await performAttack("player", special, attackType);
       if (checkFaint()) return;
     }
 
@@ -270,10 +277,16 @@ export default function BattleScreen({ playerTeam, opponent, onEnd }: BattleScre
         ))}
       </div>
 
-      {waitingForPlayer && (
+      {waitingForPlayer && activePlayer && (
         <div className="actions">
-          <button onClick={() => handlePlayerChoice(false)}>Attaque normale</button>
-          <button onClick={() => handlePlayerChoice(true)}>Attaque spéciale</button>
+          {activePlayer.pokemon.types.flatMap(type => [
+            <button key={`${type}-normal`} onClick={() => handlePlayerChoice(type, false)}>
+              {type} normale
+            </button>,
+            <button key={`${type}-special`} onClick={() => handlePlayerChoice(type, true)}>
+              {type} spéciale
+            </button>,
+          ])}
         </div>
       )}
     </div>
