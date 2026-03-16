@@ -69,7 +69,7 @@ export const BattleArena = ({
             id: index + 1,
             dresseurId: dresseur.Id,
             opponentName: dresseur.Nom,
-            completed: !!completed[dresseur.Id],
+            completed: false,
             avatar: dresseur.Avatar,
             type: dresseur.Type.toLowerCase(),
           }));
@@ -108,14 +108,16 @@ export const BattleArena = ({
 
   // update local battle list whenever context completed flags change
   useEffect(() => {
-    if (battles.length > 0) {
-      setBattles((prev) =>
-        prev.map((b) => ({
-          ...b,
-          completed: b.dresseurId ? Boolean(completed[b.dresseurId]) : b.completed,
-        })),
-      );
-    }
+    setBattles((prev) => {
+      if (prev.length === 0) {
+        return prev;
+      }
+
+      return prev.map((b) => ({
+        ...b,
+        completed: b.dresseurId ? Boolean(completed[b.dresseurId]) : b.completed,
+      }));
+    });
   }, [completed]);
   const progress = (completedBattles / battles.length) * 100;
   const allBattlesCompleted = completedBattles === battles.length;
@@ -161,6 +163,8 @@ export const BattleArena = ({
   // Effet pour vérifier si tous les combats sont complétés et mettre à jour le niveau
   useEffect(() => {
     if (
+      !loadingDresseurs &&
+      battles.length > 0 &&
       allBattlesCompleted &&
       !levelUpProcessing &&
       userLevel &&
@@ -174,6 +178,8 @@ export const BattleArena = ({
     }
   }, [
     allBattlesCompleted,
+    loadingDresseurs,
+    battles.length,
     levelUpProcessing,
     userLevel,
     generation.generation,

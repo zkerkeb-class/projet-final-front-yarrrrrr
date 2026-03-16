@@ -31,6 +31,16 @@
   gap: 20px;
 }
 
+.app-title-image {
+  display: block;
+  width: min(56vw, 680px);
+  height: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-drag: none;
+}
+
 .app-subtitle {
   color: #ccc;
   font-size: 1.2rem;
@@ -53,6 +63,10 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+  }
+
+  .app-title-image {
+    width: min(86vw, 500px);
   }
 
   .app-subtitle {

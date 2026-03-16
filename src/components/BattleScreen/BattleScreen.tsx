@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { Pokemon, Dresseur } from "../../types";
 import { getTypeEffectiveness } from "../../constants/typeChart";
 import "./BattleScreen.css";
@@ -26,6 +26,7 @@ export default function BattleScreen({ playerTeam, opponent, onEnd }: BattleScre
   const [opponentNextSpecial, setOpponentNextSpecial] = useState(false);
   const [animating, setAnimating] = useState<"player" | "opponent" | null>(null);
   const [showStart, setShowStart] = useState(true);
+  const battleLogRef = useRef<HTMLDivElement | null>(null);
 
   // utility to append log
   const addLog = (text: string) => {
@@ -184,6 +185,13 @@ export default function BattleScreen({ playerTeam, opponent, onEnd }: BattleScre
     return () => clearTimeout(timer);
   }, [opponent]);
 
+  // Keep the combat log pinned to the latest message.
+  useEffect(() => {
+    if (battleLogRef.current) {
+      battleLogRef.current.scrollTop = battleLogRef.current.scrollHeight;
+    }
+  }, [log]);
+
   // if one side changed hp or idx, check faint automatically
   useEffect(() => {
     // only run if both arrays have entries
@@ -271,7 +279,7 @@ export default function BattleScreen({ playerTeam, opponent, onEnd }: BattleScre
         </div>
       </div>
 
-      <div className="battle-log">
+      <div className="battle-log" ref={battleLogRef}>
         {log.map((l, idx) => (
           <div key={idx}>{l}</div>
         ))}

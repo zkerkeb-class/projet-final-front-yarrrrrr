@@ -8,13 +8,13 @@ import {
   // BattleScreen not used in App itself
   BattlePage,
 } from "./components";
-import { Titre } from "./components/Titre/Titre";
 import Login, { type AuthUser } from "./components/login/login";
 import UserProfile from "./components/UserProfile/UserProfile";
 import EditProfil from "./components/EditProfil/EditProfil";
 import { GENERATIONS } from "./constants/generations";
 import type { GenerationData, Pokemon } from "./types";
 import { BattleProgressProvider } from "./contexts/BattleProgressContext";
+import titreImage from "./assets/titre.png";
 import "./App.css";
 
 const API_URL = "http://localhost:3001";
@@ -220,7 +220,12 @@ function App() {
       <div className="app">
         <header className="app-header">
           <div className="app-header-top">
-            <Titre text="Pokemon Rogue League" />
+            <img
+              src={titreImage}
+              alt="Pokemon Rogue League"
+              className="app-title-image"
+              draggable={false}
+            />
             <UserProfile
               user={authUser}
               onLogout={clearSession}
