@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { BATTLES_PER_GENERATION } from "../../constants/generations";
 import type { Battle, GenerationData, Dresseur, Pokemon } from "../../types";
 import type { AuthUser } from "../login/login";
 import { Door } from "../Door/Door";
@@ -31,6 +32,8 @@ export const BattleArena = ({
   const [battles, setBattles] = useState<Battle[]>([]);
   const [levelUpProcessing, setLevelUpProcessing] = useState(false);
   const [loadingDresseurs, setLoadingDresseurs] = useState(true);
+  const navigate = useNavigate();
+  const { completed, getCompletedCountForGeneration } = useBattleProgress();
 
 
   // Précharger les images des types
@@ -69,7 +72,7 @@ export const BattleArena = ({
             id: index + 1,
             dresseurId: dresseur.Id,
             opponentName: dresseur.Nom,
-            completed: false,
+            completed: Boolean(completed[dresseur.Id]),
             avatar: dresseur.Avatar,
             type: dresseur.Type.toLowerCase(),
           }));
@@ -86,10 +89,7 @@ export const BattleArena = ({
     };
 
     loadDresseurs();
-  }, [generation.generation]);
-
-  const navigate = useNavigate();
-  const { completed } = useBattleProgress();
+  }, [generation.generation, completed]);
 
   const handleBattleClick = (battle: Battle) => {
     if (userTeam.length === 0) {
@@ -104,7 +104,7 @@ export const BattleArena = ({
     navigate(`/battle/${generation.generation}/${battle.dresseurId}`);
   };
 
-  const completedBattles = battles.filter((b) => b.completed).length;
+  const completedBattles = getCompletedCountForGeneration(generation.generation);
 
   // update local battle list whenever context completed flags change
   useEffect(() => {
@@ -119,8 +119,10 @@ export const BattleArena = ({
       }));
     });
   }, [completed]);
-  const progress = (completedBattles / battles.length) * 100;
-  const allBattlesCompleted = completedBattles === battles.length;
+  const progress = battles.length > 0
+    ? (completedBattles / battles.length) * 100
+    : (completedBattles / BATTLES_PER_GENERATION) * 100;
+  const allBattlesCompleted = battles.length > 0 && completedBattles === battles.length;
 
   const handleLevelUp = useCallback(async () => {
     if (levelUpProcessing) return;
@@ -143,6 +145,20 @@ export const BattleArena = ({
 
       if (response.ok) {
         const updatedUser = await response.json();
+
+        if (updatedUser.user?.id) {
+          const rewardResponse = await fetch(
+            `http://localhost:3001/api/pools/${updatedUser.user.id}/reward-roll`,
+            {
+              method: "POST",
+            },
+          );
+
+          if (!rewardResponse.ok) {
+            console.error("Erreur lors de l'ajout du roll de récompense");
+          }
+        }
+
         // Appeler le callback pour mettre à jour le profil dans l'app
         if (onProfileUpdated) {
           onProfileUpdated(updatedUser.user);

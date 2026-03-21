@@ -42,6 +42,7 @@ export interface GenerationData {
   name: string;
   color: string;
   description: string;
+  image: string;
 }
 
 export interface PokemonStats {

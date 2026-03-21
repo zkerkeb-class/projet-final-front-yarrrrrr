@@ -27,6 +27,8 @@ export const Door = ({ battle, generationColor, onBattleClick }: DoorProps) => {
         borderColor: battle.completed ? "#2A75BB" : "#E3350D",
       }}
     >
+      {battle.completed && <span className="door-status-badge">Battu</span>}
+
       {/* <div className="door-number" style={{ color: generationColor }}>
         {battle.id}
       </div> */}
@@ -38,7 +40,6 @@ export const Door = ({ battle, generationColor, onBattleClick }: DoorProps) => {
           ) : (
             <div className="no-image">?</div>
           )}
-          {battle.completed && <span className="check-mark">✓</span>}
         </div>
 
         <h3 className="door-opponent">{battle.opponentName}</h3>

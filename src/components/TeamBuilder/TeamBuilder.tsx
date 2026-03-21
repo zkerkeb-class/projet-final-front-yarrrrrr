@@ -101,6 +101,12 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
     e.dataTransfer.dropEffect = "move";
   };
 
+  const isPokemonAlreadyInTeam = (pokemonId: number, excludedIndex?: number) => {
+    return team.some(
+      (member, index) => index !== excludedIndex && member?.id === pokemonId
+    );
+  };
+
   const handleDropTeam = (e: React.DragEvent<HTMLDivElement>, teamIndex: number) => {
     e.preventDefault();
     
@@ -109,6 +115,11 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
     const pokemon = JSON.parse(pokemonData) as Pokemon;
 
     if (source === "available") {
+      if (isPokemonAlreadyInTeam(pokemon.id, teamIndex)) {
+        alert("Vous ne pouvez pas prendre plusieurs fois le même Pokémon.");
+        return;
+      }
+
       // Ajouter à l'équipe
       const newTeam = [...team];
       newTeam[teamIndex] = pokemon;
@@ -133,6 +144,12 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
     const filledTeam = team.filter((p) => p !== null);
     if (filledTeam.length === 0) {
       alert("Veuillez ajouter au moins un pokémon à votre équipe!");
+      return;
+    }
+
+    const uniquePokemonIds = new Set(filledTeam.map((pokemon) => pokemon.id));
+    if (uniquePokemonIds.size !== filledTeam.length) {
+      alert("Votre équipe ne peut pas contenir plusieurs fois le même Pokémon.");
       return;
     }
 
@@ -254,12 +271,16 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
           {error && <div className="error-message">{error}</div>}
           <div className="pokemon-grid">
             {availablePokemon.map((pokemon) => (
+              (() => {
+                const isAlreadySelected = isPokemonAlreadyInTeam(pokemon.id);
+                return (
               <div
                 key={pokemon.id}
-                className="pokemon-card"
-                draggable
-                onDragStart={(e) => handleDragStart(e, pokemon, "available")}
+                className={`pokemon-card ${isAlreadySelected ? "pokemon-card-selected" : ""}`}
+                draggable={!isAlreadySelected}
+                onDragStart={isAlreadySelected ? undefined : (e) => handleDragStart(e, pokemon, "available")}
                 onClick={() => setSelectedPokemon(pokemon)}
+                title={isAlreadySelected ? "Déjà dans votre équipe" : "Glisser pour ajouter à l'équipe"}
               >
                 <img src={pokemon.image} alt={pokemon.name} />
                 <div className="pokemon-info-card">
@@ -271,8 +292,11 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
                       </span>
                     ))}
                   </div>
+                  {isAlreadySelected && <div className="pokemon-selected-label">Déjà choisi</div>}
                 </div>
               </div>
+                );
+              })()
             ))}
           </div>
         </div>

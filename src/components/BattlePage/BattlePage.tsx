@@ -54,8 +54,8 @@ export default function BattlePage({ authUser }: BattlePageProps) {
   }, [authUser, gen, dresseurId]);
 
   const handleEnd = (won: boolean) => {
-    if (won && opponent) {
-      markCompleted(opponent.Id);
+    if (won && opponent && gen) {
+      markCompleted(opponent.Id, Number(gen));
     }
     navigate(-1);
   };

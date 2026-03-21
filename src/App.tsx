@@ -268,7 +268,7 @@ function App() {
   // top level return includes router and provider
   return (
     <BrowserRouter>
-      <BattleProgressProvider>
+      <BattleProgressProvider userId={authUser?.id}>
         <Routes>
           <Route
             path="/battle/:gen/:dresseurId"
