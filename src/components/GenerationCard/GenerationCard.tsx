@@ -16,18 +16,15 @@ export const GenerationCard = ({
 }: GenerationCardProps) => {
   const isLocked = generation.generation > userLevel;
   return (
-    <div className="generation-card" style={{ borderColor: generation.color }}>
+    <div className="generation-card" style={{ borderColor: "#E3350D" }}>
       <div className="generation-header">
-        <h1 className="generation-title" style={{ color: generation.color }}>
+        <h1 className="generation-title">
           {generation.name}
         </h1>
       </div>
 
       {/* Placeholder image - carré noir */}
-      <div
-        className="generation-image-placeholder"
-        style={{ backgroundColor: "#000" }}
-      >
+      <div className="generation-image-placeholder">
         <span className="placeholder-text">GEN {generation.generation}</span>
       </div>
 
@@ -40,10 +37,10 @@ export const GenerationCard = ({
         <button
           className={`enter-arena-button ${isLocked ? "locked" : ""}`}
           style={{
-            backgroundColor: isLocked ? "#666" : generation.color,
+            backgroundColor: isLocked ? "#9CA9BF" : "#2A75BB",
             boxShadow: isLocked
-              ? "0 4px 15px rgba(0,0,0,0.3)"
-              : `0 4px 15px ${generation.color}40`,
+              ? "0 4px 15px rgba(0, 0, 0, 0.2)"
+              : "0 4px 15px rgba(255, 203, 5, 0.65)",
           }}
           onClick={isLocked ? undefined : onEnterArena}
           disabled={isLocked}

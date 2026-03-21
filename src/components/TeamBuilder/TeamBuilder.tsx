@@ -25,7 +25,6 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
   // If preFilledTeam changes after mount (e.g. loaded async), sync the state.
   useEffect(() => {
     setTeam(makeInitialTeam(preFilledTeam));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preFilledTeam]);
   const [availablePokemon, setAvailablePokemon] = useState<Pokemon[]>([]);
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
@@ -54,7 +53,7 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
     };
 
     loadPool();
-  }, [generation.generation]);
+  }, [authUser?.id, generation.generation]);
 
   // Consommer un roll et générer un nouveau pool
   const handleRoll = async () => {
@@ -184,14 +183,14 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
 
   if (loading) {
     return (
-      <div className="team-builder">
+      <div className="team-builder allow-drag-select">
         <div className="loading">Chargement des pokémons...</div>
       </div>
     );
   }
 
   return (
-    <div className="team-builder">
+    <div className="team-builder allow-drag-select">
       <div className="team-builder-header">
         <button className="back-button" onClick={onBackToArena}>
           ← Retour

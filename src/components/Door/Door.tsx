@@ -24,7 +24,7 @@ export const Door = ({ battle, generationColor, onBattleClick }: DoorProps) => {
       className={`door ${battle.completed ? "completed" : ""}`}
       onClick={onBattleClick}
       style={{
-        borderColor: battle.completed ? "#4CAF50" : generationColor,
+        borderColor: battle.completed ? "#2A75BB" : "#E3350D",
       }}
     >
       {/* <div className="door-number" style={{ color: generationColor }}>

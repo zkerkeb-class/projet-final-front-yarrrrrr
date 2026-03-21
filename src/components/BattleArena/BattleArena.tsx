@@ -196,14 +196,13 @@ export const BattleArena = ({
           ← Back to Generations
         </button>
 
-        <h1 className="arena-title" style={{ color: generation.color }}>
+        <h1 className="arena-title">
           {generation.name} - Battle Arena
         </h1>
 
         <button
           className="build-team-button"
           onClick={onBuildTeam}
-          style={{ borderColor: generation.color, color: generation.color }}
         >
           🎮 Build Your Team
         </button>
