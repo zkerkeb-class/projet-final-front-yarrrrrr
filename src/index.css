@@ -41,3 +41,22 @@ button:focus-visible {
   outline: 2px solid #646cff;
   outline-offset: 2px;
 }
+
+html.no-drag-select,
+html.no-drag-select * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+html.no-drag-select .allow-drag-select,
+html.no-drag-select .allow-drag-select * {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+  -webkit-user-drag: auto;
+  -webkit-touch-callout: default;
+}
