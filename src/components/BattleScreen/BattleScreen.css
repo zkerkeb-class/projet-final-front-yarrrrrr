@@ -1,0 +1,180 @@
+.battle-screen {
+  min-height: 100vh;
+  max-height: 100vh;
+  background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.start-banner {
+  position: absolute;
+  top: 20%;
+  display: flex;
+  align-items: center;
+  animation: fadeOut 1s ease-in-out 1 forwards;
+}
+
+.start-avatar {
+  width: 80px;
+  height: 80px;
+  margin-right: 15px;
+}
+
+.start-pokemon {
+  width: 120px;
+  animation: slideIn 0.6s ease-out;
+  margin-right: 10px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.start-text {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: bold;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.battle-field {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.opponent-side,
+.player-side {
+  position: absolute;
+  bottom: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 30;
+}
+
+.opponent-side {
+  right: 20px;
+}
+
+.player-side {
+  left: 20px;
+}
+
+.pokemon-sprite {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  display: block;
+  border: none;
+  background: transparent;
+  transition: transform 0.3s ease;
+}
+
+.pokemon-sprite.attack {
+  transform: translateX(-30px);
+}
+
+.player-side .pokemon-sprite.attack {
+  transform: translateX(30px);
+}
+
+.hp-bar {
+  width: 160px;
+  background: #555;
+  border: 2px solid #222;
+  border-radius: 8px;
+  margin-top: 8px;
+  position: relative;
+}
+
+.hp-fill {
+  height: 100%;
+  background: #f00;
+  transition: width 0.3s ease;
+}
+
+.hp-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 0;
+  font-size: 0.9rem;
+}
+
+.battle-log {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 900px;
+  height: 120px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #999;
+  border-radius: 8px;
+  padding: 10px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  z-index: 10;
+}
+
+.actions {
+  position: absolute;
+  bottom: 160px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 20;
+}
+
+.actions button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: 2px solid #fff;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.actions button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.forfeit-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 1100;
+}
+
+.forfeit-button:hover {
+  background: rgba(255, 0, 0, 0.8);
+}
