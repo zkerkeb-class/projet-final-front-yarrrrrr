@@ -40,13 +40,13 @@ export default function EditProfil({
 		resetFeedback();
 
 		if (!username.trim()) {
-			setError("Le username est requis.");
+			setError("Le nom d'utilisateur est requis.");
 			return;
 		}
 
 		if (password.trim()) {
 			if (password !== passwordConfirm) {
-				setError("Les passwords ne correspondent pas.");
+				setError("Les mots de passe ne correspondent pas.");
 				return;
 			}
 		}
@@ -123,18 +123,18 @@ export default function EditProfil({
 
 				<form onSubmit={handleSubmit}>
 					<div className="form-group">
-						<label htmlFor="username">Username</label>
+						<label htmlFor="username">Nom d'utilisateur</label>
 						<input
 							id="username"
 							type="text"
 							value={username}
 							onChange={(event) => setUsername(event.target.value)}
-							placeholder="Ton username"
+							placeholder="Ton nom d'utilisateur"
 						/>
 					</div>
 
 					<div className="form-group">
-						<label htmlFor="password">Nouveau password (optionnel)</label>
+						<label htmlFor="password">Nouveau mot de passe (optionnel)</label>
 						<input
 							id="password"
 							type="password"
@@ -148,14 +148,14 @@ export default function EditProfil({
 				{password.length > 0 && (
 					<div className="form-group">
 						<label htmlFor="password-confirm">
-							Confirme le password
+							Confirme le mot de passe
 						</label>
 						<input
 							id="password-confirm"
 							type="password"
 							value={passwordConfirm}
 							onChange={(event) => setPasswordConfirm(event.target.value)}
-							placeholder="Confirme ton password"
+							placeholder="Confirme ton mot de passe"
 							autoComplete="new-password"
 						/>
 					</div>

@@ -80,7 +80,7 @@ export const GenerationCard = ({
           onClick={isLocked ? undefined : onEnterArena}
           disabled={isLocked}
         >
-          {isLocked ? "🔒 Verrouillé" : "Enter Arena"}
+          {isLocked ? "🔒 Verrouillé" : "Entrer dans l'arène"}
         </button>
         {isLocked && (
           <div className="lock-tooltip">

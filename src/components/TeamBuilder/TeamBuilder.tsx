@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { Pokemon, GenerationData } from "../../types";
 import type { AuthUser } from "../login/login";
+import { translatePokemonType } from "../../constants/typeTranslations";
 import "./TeamBuilder.css";
 
 interface TeamBuilderProps {
@@ -58,7 +59,7 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
   // Consommer un roll et générer un nouveau pool
   const handleRoll = async () => {
     if (rollsLeft <= 0) {
-      alert("Plus de rolls disponibles");
+      alert("Plus de relances disponibles");
       return;
     }
     try {
@@ -67,7 +68,7 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
       const res = await fetch(`http://localhost:3001/api/pools/${userId}/${generation.generation}/roll`, { method: 'POST' });
       if (!res.ok) {
         const err = await res.json().catch(() => null);
-        alert(err?.message || "Erreur lors du roll");
+        alert(err?.message || "Erreur lors de la relance");
         return;
       }
       const data = await res.json();
@@ -75,7 +76,7 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
       setRollsLeft(typeof data.rollsLeft === 'number' ? data.rollsLeft : 0);
     } catch (err) {
       console.error(err);
-      alert("Erreur lors du roll");
+      alert("Erreur lors de la relance");
     } finally {
       setLoading(false);
     }
@@ -218,11 +219,11 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
             className="roll-button"
             onClick={handleRoll}
             disabled={loading || rollsLeft <= 0}
-            title={rollsLeft > 0 ? "Générer un nouveau pool (consomme un roll)" : "Aucun roll restant"}
+            title={rollsLeft > 0 ? "Générer un nouveau pool (consomme une relance)" : "Aucune relance restante"}
           >
-            🎲 Roll
+            🎲 Relancer
           </button>
-          <span className="rolls-left">Rolls: {rollsLeft}</span>
+          <span className="rolls-left">Relances : {rollsLeft}</span>
 
           <button className="save-button" onClick={handleSaveTeam}>
             💾 Sauvegarder l'équipe
@@ -256,7 +257,7 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
                   </div>
                 ) : (
                   <div className="empty-slot">
-                    <div className="slot-number">Slot {index + 1}</div>
+                    <div className="slot-number">Emplacement {index + 1}</div>
                     <div className="drag-hint">Glissez un pokémon ici</div>
                   </div>
                 )}
@@ -288,7 +289,7 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
                   <div className="pokemon-types">
                     {pokemon.types.map((type) => (
                       <span key={type} className="type-badge">
-                        {type}
+                        {translatePokemonType(type)}
                       </span>
                     ))}
                   </div>
@@ -311,7 +312,7 @@ export const TeamBuilder = ({ generation, onBackToArena, preFilledTeam, authUser
               <div className="types">
                 {selectedPokemon.types.map((type) => (
                   <span key={type} className="type-badge-detail">
-                    {type}
+                    {translatePokemonType(type)}
                   </span>
                 ))}
               </div>

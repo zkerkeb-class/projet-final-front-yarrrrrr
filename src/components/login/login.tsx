@@ -48,7 +48,7 @@ export default function Login({ onAuthSuccess }: LoginProps) {
 		resetFeedback();
 
 		if (!username.trim() || !password.trim()) {
-			setError("Username et password sont requis.");
+			setError("Nom d'utilisateur et mot de passe sont requis.");
 			return;
 		}
 
@@ -85,7 +85,7 @@ export default function Login({ onAuthSuccess }: LoginProps) {
 		resetFeedback();
 
 		if (!username.trim() || !password.trim()) {
-			setError("Username et password sont requis.");
+			setError("Nom d'utilisateur et mot de passe sont requis.");
 			return;
 		}
 
@@ -139,7 +139,7 @@ export default function Login({ onAuthSuccess }: LoginProps) {
 							resetFeedback();
 						}}
 					>
-						Login
+						Connexion
 					</button>
 					<button
 						type="button"
@@ -154,24 +154,24 @@ export default function Login({ onAuthSuccess }: LoginProps) {
 				</div>
 
 				<form onSubmit={mode === "login" ? handleLogin : handleRegister}>
-					<label htmlFor="username">Username</label>
+					<label htmlFor="username">Nom d'utilisateur</label>
 					<input
 						id="username"
 						type="text"
 						value={username}
 						onChange={(event) => setUsername(event.target.value)}
 						autoComplete="username"
-						placeholder="Ton username"
+						placeholder="Ton nom d'utilisateur"
 					/>
 
-					<label htmlFor="password">Password</label>
+					<label htmlFor="password">Mot de passe</label>
 					<input
 						id="password"
 						type="password"
 						value={password}
 						onChange={(event) => setPassword(event.target.value)}
 						autoComplete={mode === "login" ? "current-password" : "new-password"}
-						placeholder="Ton password"
+						placeholder="Ton mot de passe"
 					/>
 
 					{mode === "register" && (

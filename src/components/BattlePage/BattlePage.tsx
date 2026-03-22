@@ -14,6 +14,7 @@ export default function BattlePage({ authUser }: BattlePageProps) {
   const navigate = useNavigate();
   const [playerTeam, setPlayerTeam] = useState<Pokemon[]>([]);
   const [opponent, setOpponent] = useState<Dresseur | null>(null);
+  const [opponentPokemonIds, setOpponentPokemonIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const { markCompleted } = useBattleProgress();
 
@@ -38,13 +39,31 @@ export default function BattlePage({ authUser }: BattlePageProps) {
 
       if (dresseurId) {
         try {
-          const r2 = await fetch(`http://localhost:3001/api/dresseurs/${dresseurId}`);
-          if (r2.ok) {
-            const d = await r2.json();
+          console.log(`[BattlePage] Récupération des données de combat pour le dresseur #${dresseurId}`);
+          const [dresseurRes, idsRes] = await Promise.all([
+            fetch(`http://localhost:3001/api/dresseurs/${dresseurId}`),
+            fetch(`http://localhost:3001/api/dresseurs/${dresseurId}/pokemon-ids`),
+          ]);
+
+          if (dresseurRes.ok) {
+            const d = await dresseurRes.json();
             setOpponent(d);
+          }
+
+          if (idsRes.ok) {
+            const idsData = await idsRes.json();
+            const ids = Array.isArray(idsData?.pokemonIds)
+              ? idsData.pokemonIds.filter((id: unknown): id is number => typeof id === "number")
+              : [];
+            setOpponentPokemonIds(ids);
+            console.log("[BattlePage] IDs pokémon adverses récupérés depuis la base:", ids);
+          } else {
+            setOpponentPokemonIds([]);
+            console.warn("[BattlePage] Impossible de récupérer la liste des IDs pokémon du dresseur");
           }
         } catch (err) {
           console.error("Erreur chargement dresseur page combat", err);
+          setOpponentPokemonIds([]);
         }
       }
 
@@ -68,6 +87,11 @@ export default function BattlePage({ authUser }: BattlePageProps) {
   }
 
   return (
-    <BattleScreen playerTeam={playerTeam} opponent={opponent} onEnd={handleEnd} />
+    <BattleScreen
+      playerTeam={playerTeam}
+      opponent={opponent}
+      opponentPokemonIds={opponentPokemonIds}
+      onEnd={handleEnd}
+    />
   );
 }

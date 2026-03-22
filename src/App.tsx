@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import {
   Carousel,
   GenerationCard,
@@ -15,11 +15,146 @@ import { GENERATIONS } from "./constants/generations";
 import type { GenerationData, Pokemon } from "./types";
 import { BattleProgressProvider } from "./contexts/BattleProgressContext";
 import titreImage from "./assets/titre.png";
+import mainMusic from "./music/main.mp3";
+import battleMusic from "./music/battle.mp3";
 import "./App.css";
 
 const API_URL = "http://localhost:3001";
 const TOKEN_STORAGE_KEY = "authToken";
 const USER_STORAGE_KEY = "authUser";
+
+const AUDIO_VOLUME = 0.1;
+
+function AudioRouteManager() {
+  const location = useLocation();
+  const mainAudioRef = useRef<HTMLAudioElement | null>(null);
+  const battleAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isPlaybackStarted, setIsPlaybackStarted] = useState(false);
+
+  const applyMuteState = useCallback((muted: boolean) => {
+    const mainAudio = mainAudioRef.current;
+    const battleAudio = battleAudioRef.current;
+    if (!mainAudio || !battleAudio) return;
+
+    mainAudio.muted = muted;
+    battleAudio.muted = muted;
+  }, []);
+
+  const playTrackForPath = useCallback((pathname: string) => {
+    const mainAudio = mainAudioRef.current;
+    const battleAudio = battleAudioRef.current;
+    if (!mainAudio || !battleAudio) return;
+
+    if (isMuted) {
+      mainAudio.pause();
+      battleAudio.pause();
+      setIsPlaybackStarted(false);
+      return;
+    }
+
+    const isBattleRoute = pathname.startsWith("/battle/");
+    const activeAudio = isBattleRoute ? battleAudio : mainAudio;
+    const inactiveAudio = isBattleRoute ? mainAudio : battleAudio;
+
+    inactiveAudio.pause();
+    inactiveAudio.currentTime = 0;
+
+    const activePlayPromise = activeAudio.play();
+    if (activePlayPromise && typeof activePlayPromise.catch === "function") {
+      activePlayPromise
+        .then(() => {
+          setIsPlaybackStarted(true);
+        })
+        .catch(() => {
+        // Le navigateur peut bloquer l'autoplay sans interaction utilisateur.
+          setIsPlaybackStarted(false);
+        });
+    } else {
+      setIsPlaybackStarted(true);
+    }
+  }, [isMuted]);
+
+  useEffect(() => {
+    const mainAudio = new Audio(mainMusic);
+    const battleAudio = new Audio(battleMusic);
+
+    mainAudio.loop = true;
+    battleAudio.loop = true;
+    mainAudio.volume = AUDIO_VOLUME;
+    battleAudio.volume = AUDIO_VOLUME;
+
+    mainAudioRef.current = mainAudio;
+    battleAudioRef.current = battleAudio;
+    applyMuteState(isMuted);
+
+    playTrackForPath(location.pathname);
+
+    return () => {
+      mainAudio.pause();
+      battleAudio.pause();
+      mainAudioRef.current = null;
+      battleAudioRef.current = null;
+    };
+  }, [applyMuteState, isMuted, location.pathname, playTrackForPath]);
+
+  useEffect(() => {
+    playTrackForPath(location.pathname);
+  }, [location.pathname, playTrackForPath]);
+
+  useEffect(() => {
+    applyMuteState(isMuted);
+    if (!isMuted) {
+      playTrackForPath(location.pathname);
+    }
+  }, [applyMuteState, isMuted, location.pathname, playTrackForPath]);
+
+  useEffect(() => {
+    const unlockPlayback = () => {
+      playTrackForPath(location.pathname);
+    };
+
+    document.addEventListener("pointerdown", unlockPlayback);
+    document.addEventListener("keydown", unlockPlayback);
+
+    return () => {
+      document.removeEventListener("pointerdown", unlockPlayback);
+      document.removeEventListener("keydown", unlockPlayback);
+    };
+  }, [location.pathname, playTrackForPath]);
+
+  const handleToggleMusic = () => {
+    setIsMuted((prev) => !prev);
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleToggleMusic}
+      style={{
+        position: "fixed",
+        right: "16px",
+        bottom: "16px",
+        zIndex: 3000,
+        border: "none",
+        borderRadius: "999px",
+        padding: "10px 14px",
+        background: "rgba(0, 0, 0, 0.75)",
+        color: "#fff",
+        cursor: "pointer",
+        fontWeight: 700,
+      }}
+      aria-label={isMuted ? "Activer la musique" : "Couper la musique"}
+      title={isMuted ? "Activer la musique" : "Couper la musique"}
+    >
+      {isMuted
+        ? "🔇 Musique OFF"
+        : isPlaybackStarted
+          ? "🔊 Musique ON"
+          : "▶️ Activer la musique"}
+    </button>
+  );
+}
 
 const isTokenExpired = (token: string) => {
   try {
@@ -269,6 +404,7 @@ function App() {
   return (
     <BrowserRouter>
       <BattleProgressProvider userId={authUser?.id}>
+        <AudioRouteManager />
         <Routes>
           <Route
             path="/battle/:gen/:dresseurId"

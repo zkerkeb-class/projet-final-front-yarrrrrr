@@ -209,23 +209,23 @@ export const BattleArena = ({
     <div className="battle-arena">
       <div className="arena-header">
         <button className="back-button" onClick={onBackToCarousel}>
-          ← Back to Generations
+          ← Retour aux générations
         </button>
 
         <h1 className="arena-title">
-          {generation.name} - Battle Arena
+          {generation.name}
         </h1>
 
         <button
           className="build-team-button"
           onClick={onBuildTeam}
         >
-          🎮 Build Your Team
+          🎮 Construire mon équipe
         </button>
 
         <div className="progress-container">
           <div className="progress-text">
-            Progress: {completedBattles} / {battles.length}
+            Progression : {completedBattles} / {battles.length}
           </div>
           <div className="progress-bar">
             <div
